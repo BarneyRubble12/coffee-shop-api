@@ -35,6 +35,9 @@ func (h *CoffeeHandler) GetAllCoffees(c *gin.Context) {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
 	}
+	if coffees == nil {
+		coffees = []model.Coffee{}
+	}
 	c.JSON(http.StatusOK, coffees)
 }
 
