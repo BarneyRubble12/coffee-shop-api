@@ -10,8 +10,8 @@ import (
 
 // provideAPI creates a new API instance with all dependencies wired
 var provideAPI = wire.NewSet(
-	repository.NewInMemoryCoffeeRepository,
-	wire.Bind(new(repository.CoffeeRepository), new(*repository.InMemoryCoffeeRepository)),
+	repository.NewSQLiteCoffeeRepository,
 	service.NewCoffeeService,
 	handler.NewCoffeeHandler,
+	wire.Bind(new(repository.CoffeeRepository), new(*repository.SQLiteCoffeeRepository)),
 )

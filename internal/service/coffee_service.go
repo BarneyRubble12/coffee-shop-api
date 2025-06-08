@@ -41,3 +41,8 @@ func (s *CoffeeService) UpdateCoffee(id int, coffee model.Coffee) (model.Coffee,
 func (s *CoffeeService) DeleteCoffee(id int) error {
 	return s.repo.Delete(id)
 }
+
+// GetRepository returns the repository instance for cleanup
+func (s *CoffeeService) GetRepository() repository.CoffeeRepository {
+	return s.repo
+}

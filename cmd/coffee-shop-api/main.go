@@ -1,9 +1,15 @@
 package main
 
 import (
-	"coffee-shop-api/internal/di"
-	"coffee-shop-api/internal/docs"
 	"log"
+	"os"
+	"os/signal"
+	"syscall"
+
+	"coffee-shop-api/internal/di"
+	"coffee-shop-api/internal/repository"
+
+	_ "coffee-shop-api/internal/docs"
 
 	"github.com/gin-gonic/gin"
 	swaggerFiles "github.com/swaggo/files"
@@ -12,7 +18,7 @@ import (
 
 // @title Coffee Shop API
 // @version 1.0
-// @description A RESTful API for managing coffee products
+// @description A RESTful API for managing a coffee shop's inventory
 // @host localhost:8080
 // @BasePath /
 func main() {
@@ -22,26 +28,36 @@ func main() {
 		log.Fatalf("Failed to initialize API: %v", err)
 	}
 
-	// Create Gin router
-	r := gin.Default()
+	// Get the SQLite repository to handle cleanup
+	sqliteRepo, ok := coffeeHandler.GetRepository().(*repository.SQLiteCoffeeRepository)
+	if !ok {
+		log.Fatal("Failed to get SQLite repository")
+	}
+	defer sqliteRepo.Close()
+
+	// Set up Gin router
+	router := gin.Default()
 
 	// Swagger documentation
-	docs.SwaggerInfo.BasePath = "/"
-	r.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler, ginSwagger.URL("/swagger/doc.json")))
+	router.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
 
 	// Coffee routes
-	coffees := r.Group("/coffees")
-	{
-		coffees.GET("", coffeeHandler.GetAllCoffees)
-		coffees.GET("/:id", coffeeHandler.GetCoffeeByID)
-		coffees.POST("", coffeeHandler.CreateCoffee)
-		coffees.PUT("/:id", coffeeHandler.UpdateCoffee)
-		coffees.DELETE("/:id", coffeeHandler.DeleteCoffee)
-		coffees.GET("/search", coffeeHandler.SearchCoffeesByOrigin)
-	}
+	router.GET("/coffees", coffeeHandler.GetAllCoffees)
+	router.GET("/coffees/:id", coffeeHandler.GetCoffeeByID)
+	router.POST("/coffees", coffeeHandler.CreateCoffee)
+	router.PUT("/coffees/:id", coffeeHandler.UpdateCoffee)
+	router.DELETE("/coffees/:id", coffeeHandler.DeleteCoffee)
 
-	// Start server
-	if err := r.Run(":8080"); err != nil {
-		log.Fatalf("Failed to start server: %v", err)
-	}
+	// Set up graceful shutdown
+	quit := make(chan os.Signal, 1)
+	signal.Notify(quit, syscall.SIGINT, syscall.SIGTERM)
+
+	go func() {
+		if err := router.Run(":8080"); err != nil {
+			log.Fatalf("Failed to start server: %v", err)
+		}
+	}()
+
+	<-quit
+	log.Println("Shutting down server...")
 }
