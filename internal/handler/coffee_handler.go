@@ -1,6 +1,7 @@
 package handler
 
 import (
+	"log"
 	"net/http"
 	"strconv"
 
@@ -30,6 +31,7 @@ func NewCoffeeHandler(service *service.CoffeeService) *CoffeeHandler {
 // @Success 200 {array} model.Coffee
 // @Router /coffees [get]
 func (h *CoffeeHandler) GetAllCoffees(c *gin.Context) {
+	log.Println("Received GET /coffees")
 	coffees, err := h.service.GetAllCoffees()
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
@@ -52,7 +54,9 @@ func (h *CoffeeHandler) GetAllCoffees(c *gin.Context) {
 // @Failure 404 {object} map[string]string
 // @Router /coffees/{id} [get]
 func (h *CoffeeHandler) GetCoffeeByID(c *gin.Context) {
-	id, err := strconv.ParseInt(c.Param("id"), 10, 64)
+	idStr := c.Param("id")
+	log.Printf("Received GET /coffees/%s", idStr)
+	id, err := strconv.ParseInt(idStr, 10, 64)
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "invalid ID"})
 		return
@@ -82,7 +86,7 @@ func (h *CoffeeHandler) CreateCoffee(c *gin.Context) {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
-
+	log.Printf("Received POST /coffees with body: %+v", coffee)
 	if err := h.service.CreateCoffee(&coffee); err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
@@ -103,7 +107,9 @@ func (h *CoffeeHandler) CreateCoffee(c *gin.Context) {
 // @Failure 404 {object} map[string]string
 // @Router /coffees/{id} [put]
 func (h *CoffeeHandler) UpdateCoffee(c *gin.Context) {
-	id, err := strconv.ParseInt(c.Param("id"), 10, 64)
+	idStr := c.Param("id")
+	log.Printf("Received PUT /coffees/%s", idStr)
+	id, err := strconv.ParseInt(idStr, 10, 64)
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "invalid ID"})
 		return
@@ -114,7 +120,7 @@ func (h *CoffeeHandler) UpdateCoffee(c *gin.Context) {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
-
+	log.Printf("Update body: %+v", coffee)
 	coffee.ID = id
 	if err := h.service.UpdateCoffee(&coffee); err != nil {
 		c.JSON(http.StatusNotFound, gin.H{"error": err.Error()})
@@ -134,7 +140,9 @@ func (h *CoffeeHandler) UpdateCoffee(c *gin.Context) {
 // @Failure 404 {object} map[string]string
 // @Router /coffees/{id} [delete]
 func (h *CoffeeHandler) DeleteCoffee(c *gin.Context) {
-	id, err := strconv.ParseInt(c.Param("id"), 10, 64)
+	idStr := c.Param("id")
+	log.Printf("Received DELETE /coffees/%s", idStr)
+	id, err := strconv.ParseInt(idStr, 10, 64)
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "invalid ID"})
 		return
