@@ -1,7 +1,7 @@
 {
     "swagger": "2.0",
     "info": {
-        "description": "A RESTful API for managing coffee products",
+        "description": "A RESTful API for managing a coffee shop's inventory",
         "title": "Coffee Shop API",
         "contact": {},
         "version": "1.0"
@@ -11,7 +11,7 @@
     "paths": {
         "/coffees": {
             "get": {
-                "description": "Get a list of all coffees",
+                "description": "Get a list of all available coffees",
                 "consumes": [
                     "application/json"
                 ],
@@ -76,53 +76,9 @@
                 }
             }
         },
-        "/coffees/search": {
-            "get": {
-                "description": "Get all coffees from a specific origin",
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "coffees"
-                ],
-                "summary": "Search coffees by origin",
-                "parameters": [
-                    {
-                        "type": "string",
-                        "description": "Coffee origin",
-                        "name": "origin",
-                        "in": "query",
-                        "required": true
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "type": "array",
-                            "items": {
-                                "$ref": "#/definitions/model.Coffee"
-                            }
-                        }
-                    },
-                    "400": {
-                        "description": "Bad Request",
-                        "schema": {
-                            "type": "object",
-                            "additionalProperties": {
-                                "type": "string"
-                            }
-                        }
-                    }
-                }
-            }
-        },
         "/coffees/{id}": {
             "get": {
-                "description": "Get a coffee by its ID",
+                "description": "Get a specific coffee by its ID",
                 "consumes": [
                     "application/json"
                 ],
@@ -161,7 +117,7 @@
                 }
             },
             "put": {
-                "description": "Update an existing coffee by ID",
+                "description": "Update an existing coffee product",
                 "consumes": [
                     "application/json"
                 ],
@@ -218,7 +174,7 @@
                 }
             },
             "delete": {
-                "description": "Delete a coffee by ID",
+                "description": "Delete a coffee product by its ID",
                 "consumes": [
                     "application/json"
                 ],
@@ -259,17 +215,23 @@
         "model.Coffee": {
             "type": "object",
             "properties": {
+                "created_at": {
+                    "type": "string"
+                },
+                "description": {
+                    "type": "string"
+                },
                 "id": {
                     "type": "integer"
                 },
                 "name": {
                     "type": "string"
                 },
-                "origin": {
-                    "type": "string"
-                },
                 "price": {
                     "type": "number"
+                },
+                "updated_at": {
+                    "type": "string"
                 }
             }
         }

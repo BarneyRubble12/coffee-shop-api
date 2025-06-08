@@ -3,6 +3,7 @@ package repository
 import (
 	"errors"
 	"sync"
+	"time"
 
 	"coffee-shop-api/internal/model"
 )
@@ -13,29 +14,30 @@ var (
 
 // CoffeeRepository defines the interface for coffee data operations
 type CoffeeRepository interface {
-	GetAll() []model.Coffee
-	GetByID(id int) (model.Coffee, error)
-	Create(coffee model.Coffee) model.Coffee
-	Update(id int, coffee model.Coffee) (model.Coffee, error)
-	Delete(id int) error
+	GetAllCoffees() ([]model.Coffee, error)
+	GetCoffeeByID(id int64) (*model.Coffee, error)
+	CreateCoffee(coffee *model.Coffee) error
+	UpdateCoffee(coffee *model.Coffee) error
+	DeleteCoffee(id int64) error
 }
 
-// InMemoryCoffeeRepository implements CoffeeRepository with an in-memory store
+// InMemoryCoffeeRepository implements CoffeeRepository interface using in-memory storage
 type InMemoryCoffeeRepository struct {
-	coffees map[int]model.Coffee
+	coffees map[int64]model.Coffee
+	nextID  int64
 	mu      sync.RWMutex
-	nextID  int
 }
 
-// NewInMemoryCoffeeRepository creates a new instance of InMemoryCoffeeRepository
+// NewInMemoryCoffeeRepository creates a new in-memory repository instance
 func NewInMemoryCoffeeRepository() *InMemoryCoffeeRepository {
 	return &InMemoryCoffeeRepository{
-		coffees: make(map[int]model.Coffee),
+		coffees: make(map[int64]model.Coffee),
 		nextID:  1,
 	}
 }
 
-func (r *InMemoryCoffeeRepository) GetAll() []model.Coffee {
+// GetAllCoffees retrieves all coffees from the in-memory storage
+func (r *InMemoryCoffeeRepository) GetAllCoffees() ([]model.Coffee, error) {
 	r.mu.RLock()
 	defer r.mu.RUnlock()
 
@@ -43,49 +45,55 @@ func (r *InMemoryCoffeeRepository) GetAll() []model.Coffee {
 	for _, coffee := range r.coffees {
 		coffees = append(coffees, coffee)
 	}
-	return coffees
+	return coffees, nil
 }
 
-func (r *InMemoryCoffeeRepository) GetByID(id int) (model.Coffee, error) {
+// GetCoffeeByID retrieves a coffee by its ID
+func (r *InMemoryCoffeeRepository) GetCoffeeByID(id int64) (*model.Coffee, error) {
 	r.mu.RLock()
 	defer r.mu.RUnlock()
 
 	coffee, exists := r.coffees[id]
 	if !exists {
-		return model.Coffee{}, ErrCoffeeNotFound
+		return nil, errors.New("coffee not found")
 	}
-	return coffee, nil
+	return &coffee, nil
 }
 
-func (r *InMemoryCoffeeRepository) Create(coffee model.Coffee) model.Coffee {
+// CreateCoffee adds a new coffee to the in-memory storage
+func (r *InMemoryCoffeeRepository) CreateCoffee(coffee *model.Coffee) error {
 	r.mu.Lock()
 	defer r.mu.Unlock()
 
 	coffee.ID = r.nextID
+	coffee.CreatedAt = time.Now().UTC()
+	coffee.UpdatedAt = coffee.CreatedAt
+	r.coffees[coffee.ID] = *coffee
 	r.nextID++
-	r.coffees[coffee.ID] = coffee
-	return coffee
+	return nil
 }
 
-func (r *InMemoryCoffeeRepository) Update(id int, coffee model.Coffee) (model.Coffee, error) {
+// UpdateCoffee updates an existing coffee in the in-memory storage
+func (r *InMemoryCoffeeRepository) UpdateCoffee(coffee *model.Coffee) error {
 	r.mu.Lock()
 	defer r.mu.Unlock()
 
-	if _, exists := r.coffees[id]; !exists {
-		return model.Coffee{}, ErrCoffeeNotFound
+	if _, exists := r.coffees[coffee.ID]; !exists {
+		return errors.New("coffee not found")
 	}
 
-	coffee.ID = id
-	r.coffees[id] = coffee
-	return coffee, nil
+	coffee.UpdatedAt = time.Now().UTC()
+	r.coffees[coffee.ID] = *coffee
+	return nil
 }
 
-func (r *InMemoryCoffeeRepository) Delete(id int) error {
+// DeleteCoffee removes a coffee from the in-memory storage
+func (r *InMemoryCoffeeRepository) DeleteCoffee(id int64) error {
 	r.mu.Lock()
 	defer r.mu.Unlock()
 
 	if _, exists := r.coffees[id]; !exists {
-		return ErrCoffeeNotFound
+		return errors.New("coffee not found")
 	}
 
 	delete(r.coffees, id)

@@ -10,36 +10,34 @@ type CoffeeService struct {
 	repo repository.CoffeeRepository
 }
 
-// NewCoffeeService creates a new instance of CoffeeService
+// NewCoffeeService creates a new coffee service instance
 func NewCoffeeService(repo repository.CoffeeRepository) *CoffeeService {
-	return &CoffeeService{
-		repo: repo,
-	}
+	return &CoffeeService{repo: repo}
 }
 
-// GetAllCoffees returns all coffees
-func (s *CoffeeService) GetAllCoffees() []model.Coffee {
-	return s.repo.GetAll()
+// GetAllCoffees retrieves all coffees
+func (s *CoffeeService) GetAllCoffees() ([]model.Coffee, error) {
+	return s.repo.GetAllCoffees()
 }
 
-// GetCoffeeByID returns a coffee by its ID
-func (s *CoffeeService) GetCoffeeByID(id int) (model.Coffee, error) {
-	return s.repo.GetByID(id)
+// GetCoffeeByID retrieves a coffee by its ID
+func (s *CoffeeService) GetCoffeeByID(id int64) (*model.Coffee, error) {
+	return s.repo.GetCoffeeByID(id)
 }
 
 // CreateCoffee creates a new coffee
-func (s *CoffeeService) CreateCoffee(coffee model.Coffee) model.Coffee {
-	return s.repo.Create(coffee)
+func (s *CoffeeService) CreateCoffee(coffee *model.Coffee) error {
+	return s.repo.CreateCoffee(coffee)
 }
 
 // UpdateCoffee updates an existing coffee
-func (s *CoffeeService) UpdateCoffee(id int, coffee model.Coffee) (model.Coffee, error) {
-	return s.repo.Update(id, coffee)
+func (s *CoffeeService) UpdateCoffee(coffee *model.Coffee) error {
+	return s.repo.UpdateCoffee(coffee)
 }
 
 // DeleteCoffee deletes a coffee by its ID
-func (s *CoffeeService) DeleteCoffee(id int) error {
-	return s.repo.Delete(id)
+func (s *CoffeeService) DeleteCoffee(id int64) error {
+	return s.repo.DeleteCoffee(id)
 }
 
 // GetRepository returns the repository instance for cleanup

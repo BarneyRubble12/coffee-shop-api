@@ -1,3 +1,6 @@
+//go:build wireinject
+// +build wireinject
+
 package di
 
 import (
@@ -8,10 +11,13 @@ import (
 	"github.com/google/wire"
 )
 
-// provideAPI creates a new API instance with all dependencies wired
-var provideAPI = wire.NewSet(
-	repository.NewSQLiteCoffeeRepository,
-	service.NewCoffeeService,
-	handler.NewCoffeeHandler,
-	wire.Bind(new(repository.CoffeeRepository), new(*repository.SQLiteCoffeeRepository)),
-)
+func InitializeAPI() (*handler.CoffeeHandler, error) {
+	wire.Build(
+		provideDBPath,
+		repository.NewSQLiteCoffeeRepository,
+		service.NewCoffeeService,
+		handler.NewCoffeeHandler,
+		wire.Bind(new(repository.CoffeeRepository), new(*repository.SQLiteCoffeeRepository)),
+	)
+	return nil, nil
+}

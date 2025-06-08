@@ -31,9 +31,13 @@ func main() {
 	// Get the SQLite repository to handle cleanup
 	sqliteRepo, ok := coffeeHandler.GetRepository().(*repository.SQLiteCoffeeRepository)
 	if !ok {
-		log.Fatal("Failed to get SQLite repository")
+		log.Fatal("Failed to get SQLite repository: type assertion failed")
 	}
-	defer sqliteRepo.Close()
+	defer func() {
+		if err := sqliteRepo.Close(); err != nil {
+			log.Printf("Error closing database connection: %v", err)
+		}
+	}()
 
 	// Set up Gin router
 	router := gin.Default()

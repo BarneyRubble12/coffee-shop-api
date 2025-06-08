@@ -2,19 +2,23 @@ basePath: /
 definitions:
   model.Coffee:
     properties:
+      created_at:
+        type: string
+      description:
+        type: string
       id:
         type: integer
       name:
         type: string
-      origin:
-        type: string
       price:
         type: number
+      updated_at:
+        type: string
     type: object
 host: localhost:8080
 info:
   contact: {}
-  description: A RESTful API for managing coffee products
+  description: A RESTful API for managing a coffee shop's inventory
   title: Coffee Shop API
   version: "1.0"
 paths:
@@ -22,7 +26,7 @@ paths:
     get:
       consumes:
       - application/json
-      description: Get a list of all coffees
+      description: Get a list of all available coffees
       produces:
       - application/json
       responses:
@@ -66,7 +70,7 @@ paths:
     delete:
       consumes:
       - application/json
-      description: Delete a coffee by ID
+      description: Delete a coffee product by its ID
       parameters:
       - description: Coffee ID
         in: path
@@ -90,7 +94,7 @@ paths:
     get:
       consumes:
       - application/json
-      description: Get a coffee by its ID
+      description: Get a specific coffee by its ID
       parameters:
       - description: Coffee ID
         in: path
@@ -116,7 +120,7 @@ paths:
     put:
       consumes:
       - application/json
-      description: Update an existing coffee by ID
+      description: Update an existing coffee product
       parameters:
       - description: Coffee ID
         in: path
@@ -149,35 +153,6 @@ paths:
               type: string
             type: object
       summary: Update a coffee
-      tags:
-      - coffees
-  /coffees/search:
-    get:
-      consumes:
-      - application/json
-      description: Get all coffees from a specific origin
-      parameters:
-      - description: Coffee origin
-        in: query
-        name: origin
-        required: true
-        type: string
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            items:
-              $ref: '#/definitions/model.Coffee'
-            type: array
-        "400":
-          description: Bad Request
-          schema:
-            additionalProperties:
-              type: string
-            type: object
-      summary: Search coffees by origin
       tags:
       - coffees
 swagger: "2.0"

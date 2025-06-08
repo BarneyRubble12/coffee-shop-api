@@ -14,10 +14,13 @@ import (
 
 // Injectors from wire.go:
 
-// InitializeAPI creates a new API instance with all dependencies wired
 func InitializeAPI() (*handler.CoffeeHandler, error) {
-	inMemoryCoffeeRepository := repository.NewInMemoryCoffeeRepository()
-	coffeeService := service.NewCoffeeService(inMemoryCoffeeRepository)
+	string2 := provideDBPath()
+	sqLiteCoffeeRepository, err := repository.NewSQLiteCoffeeRepository(string2)
+	if err != nil {
+		return nil, err
+	}
+	coffeeService := service.NewCoffeeService(sqLiteCoffeeRepository)
 	coffeeHandler := handler.NewCoffeeHandler(coffeeService)
 	return coffeeHandler, nil
 }

@@ -18,7 +18,7 @@ const docTemplate = `{
     "paths": {
         "/coffees": {
             "get": {
-                "description": "Get a list of all coffees",
+                "description": "Get a list of all available coffees",
                 "consumes": [
                     "application/json"
                 ],
@@ -83,53 +83,9 @@ const docTemplate = `{
                 }
             }
         },
-        "/coffees/search": {
-            "get": {
-                "description": "Get all coffees from a specific origin",
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "coffees"
-                ],
-                "summary": "Search coffees by origin",
-                "parameters": [
-                    {
-                        "type": "string",
-                        "description": "Coffee origin",
-                        "name": "origin",
-                        "in": "query",
-                        "required": true
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "type": "array",
-                            "items": {
-                                "$ref": "#/definitions/model.Coffee"
-                            }
-                        }
-                    },
-                    "400": {
-                        "description": "Bad Request",
-                        "schema": {
-                            "type": "object",
-                            "additionalProperties": {
-                                "type": "string"
-                            }
-                        }
-                    }
-                }
-            }
-        },
         "/coffees/{id}": {
             "get": {
-                "description": "Get a coffee by its ID",
+                "description": "Get a specific coffee by its ID",
                 "consumes": [
                     "application/json"
                 ],
@@ -168,7 +124,7 @@ const docTemplate = `{
                 }
             },
             "put": {
-                "description": "Update an existing coffee by ID",
+                "description": "Update an existing coffee product",
                 "consumes": [
                     "application/json"
                 ],
@@ -225,7 +181,7 @@ const docTemplate = `{
                 }
             },
             "delete": {
-                "description": "Delete a coffee by ID",
+                "description": "Delete a coffee product by its ID",
                 "consumes": [
                     "application/json"
                 ],
@@ -266,17 +222,23 @@ const docTemplate = `{
         "model.Coffee": {
             "type": "object",
             "properties": {
+                "created_at": {
+                    "type": "string"
+                },
+                "description": {
+                    "type": "string"
+                },
                 "id": {
                     "type": "integer"
                 },
                 "name": {
                     "type": "string"
                 },
-                "origin": {
-                    "type": "string"
-                },
                 "price": {
                     "type": "number"
+                },
+                "updated_at": {
+                    "type": "string"
                 }
             }
         }
@@ -290,7 +252,7 @@ var SwaggerInfo = &swag.Spec{
 	BasePath:         "/",
 	Schemes:          []string{},
 	Title:            "Coffee Shop API",
-	Description:      "A RESTful API for managing coffee products",
+	Description:      "A RESTful API for managing a coffee shop's inventory",
 	InfoInstanceName: "swagger",
 	SwaggerTemplate:  docTemplate,
 }
