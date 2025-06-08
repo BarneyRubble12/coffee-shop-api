@@ -1,0 +1,183 @@
+basePath: /
+definitions:
+  model.Coffee:
+    properties:
+      id:
+        type: integer
+      name:
+        type: string
+      origin:
+        type: string
+      price:
+        type: number
+    type: object
+host: localhost:8080
+info:
+  contact: {}
+  description: A RESTful API for managing coffee products
+  title: Coffee Shop API
+  version: "1.0"
+paths:
+  /coffees:
+    get:
+      consumes:
+      - application/json
+      description: Get a list of all coffees
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/model.Coffee'
+            type: array
+      summary: Get all coffees
+      tags:
+      - coffees
+    post:
+      consumes:
+      - application/json
+      description: Create a new coffee product
+      parameters:
+      - description: Coffee object
+        in: body
+        name: coffee
+        required: true
+        schema:
+          $ref: '#/definitions/model.Coffee'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/model.Coffee'
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Create a new coffee
+      tags:
+      - coffees
+  /coffees/{id}:
+    delete:
+      consumes:
+      - application/json
+      description: Delete a coffee by ID
+      parameters:
+      - description: Coffee ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "204":
+          description: No Content
+        "404":
+          description: Not Found
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Delete a coffee
+      tags:
+      - coffees
+    get:
+      consumes:
+      - application/json
+      description: Get a coffee by its ID
+      parameters:
+      - description: Coffee ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/model.Coffee'
+        "404":
+          description: Not Found
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Get a coffee by ID
+      tags:
+      - coffees
+    put:
+      consumes:
+      - application/json
+      description: Update an existing coffee by ID
+      parameters:
+      - description: Coffee ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: Coffee object
+        in: body
+        name: coffee
+        required: true
+        schema:
+          $ref: '#/definitions/model.Coffee'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/model.Coffee'
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "404":
+          description: Not Found
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Update a coffee
+      tags:
+      - coffees
+  /coffees/search:
+    get:
+      consumes:
+      - application/json
+      description: Get all coffees from a specific origin
+      parameters:
+      - description: Coffee origin
+        in: query
+        name: origin
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/model.Coffee'
+            type: array
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Search coffees by origin
+      tags:
+      - coffees
+swagger: "2.0"
